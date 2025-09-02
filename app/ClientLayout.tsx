@@ -1,23 +1,15 @@
-"use client";
+"use client"
 
-export const dynamic = "force-dynamic";
-
-import type React from "react";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
-import { Analytics } from "@vercel/analytics/next";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
-import "./globals.css";
+import type React from "react"
+import { GeistSans } from "geist/font/sans"
+import { GeistMono } from "geist/font/mono"
+import { Analytics } from "@vercel/analytics/next"
+import { Suspense } from "react"
+import "./globals.css"
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   // Safe default to light if no stored preference
-  const theme =
-    typeof window === "undefined"
-      ? "light"
-      : (localStorage.getItem("theme") as "light" | "dark") || "light";
-
-  const searchParams = useSearchParams();
+  const theme = typeof window === "undefined" ? "light" : (localStorage.getItem("theme") as "light" | "dark") || "light"
 
   return (
     <html lang="en" data-theme={theme} className="antialiased">
@@ -26,5 +18,5 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <Analytics />
       </body>
     </html>
-  );
+  )
 }
