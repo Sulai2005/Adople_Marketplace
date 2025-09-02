@@ -4,9 +4,9 @@ import type { Metadata } from "next"
 import ClientLayout from "./ClientLayout"
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.app",
+  title: "Marketplace",
+  description: "Adople AI Marketplace for software deals and resources",
+  generator: "Adople AI",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
