@@ -1,54 +1,52 @@
 "use client";
-
 export const dynamic = "force-dynamic";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Star, Search, ChevronDown, Sun, Moon, ShoppingCart, Bell } from "lucide-react"
-import { useState, useEffect, useMemo } from "react"
-import Link from "next/link"
-import { products as allProducts, type Product } from "@/lib/products"
-import { useRouter, useSearchParams } from "next/navigation"
+import { Button } from "@/components/ui/button";
+import { Card,CardContent,CardDescription,CardFooter,CardHeader,CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Star,Search,ChevronDown,Sun,Moon,ShoppingCart,Bell } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
+import { products as allProducts, type Product } from "@/lib/products";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function DealsPage() {
-  const [isDarkMode, setIsDarkMode] = useState(true)
-  const [query, setQuery] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("All")
-  const [selectedPlanType, setPlanType] = useState("All")
-  const [selectedStatus, setSelectedStatus] = useState("All")
-  const [priceRange, setPriceRange] = useState("All")
-  const [sortBy, setSortBy] = useState("Recommended")
-
-  const searchParams = useSearchParams()
-  const router = useRouter()
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [query, setQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedPlanType, setPlanType] = useState("All");
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [priceRange, setPriceRange] = useState("All");
+  const [sortBy, setSortBy] = useState("Recommended");
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme")
+    const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
-      setIsDarkMode(savedTheme === "dark")
+      setIsDarkMode(savedTheme === "dark");
     }
-    setQuery(searchParams.get("q") ?? "")
-    setSelectedCategory(searchParams.get("category") ?? "All")
-    setPlanType(searchParams.get("plan") ?? "All")
-    setSelectedStatus(searchParams.get("status") ?? "All")
-    setPriceRange(searchParams.get("price") ?? "All")
-    setSortBy(searchParams.get("sort") ?? "Recommended")
-  }, [searchParams])
+    setQuery(searchParams.get("q") ?? "");
+    setSelectedCategory(searchParams.get("category") ?? "All");
+    setPlanType(searchParams.get("plan") ?? "All");
+    setSelectedStatus(searchParams.get("status") ?? "All");
+    setPriceRange(searchParams.get("price") ?? "All");
+    setSortBy(searchParams.get("sort") ?? "Recommended");
+  }, [searchParams]);
 
   const toggleTheme = () => {
-    const newTheme = !isDarkMode
-    setIsDarkMode(newTheme)
-    localStorage.setItem("theme", newTheme ? "dark" : "light")
-  }
+    const newTheme = !isDarkMode;
+    setIsDarkMode(newTheme);
+    localStorage.setItem("theme", newTheme ? "dark" : "light");
+  };
 
   const updateParam = (key: string, value: string) => {
-    const p = new URLSearchParams(Array.from(searchParams.entries()))
-    if (value === "All" || value === "" || value == null) p.delete(key)
-    else p.set(key, value)
-    router.push(`/deals?${p.toString()}`)
-  }
+    const p = new URLSearchParams(Array.from(searchParams.entries()));
+    if (value === "All" || value === "" || value == null) p.delete(key);
+    else p.set(key, value);
+    router.push(`/deals?${p.toString()}`);
+  };
 
   const themeClasses = {
     bg: isDarkMode ? "bg-gray-900" : "bg-white",
@@ -64,55 +62,66 @@ export default function DealsPage() {
     footerBg: isDarkMode ? "bg-gray-900" : "bg-gray-100",
     footerBorder: isDarkMode ? "border-gray-800" : "border-gray-200",
     hoverBg: isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-100",
-  }
+  };
 
   const slugify = (s: string) =>
     s
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "")
+      .replace(/(^-|-$)/g, "");
 
   const filtered: Product[] = useMemo(() => {
-    let list = allProducts.slice()
-
+    let list = allProducts.slice();
     if (selectedCategory !== "All") {
-      list = list.filter((p) => p.category.toLowerCase() === selectedCategory.toLowerCase())
+      list = list.filter(
+        (p) => p.category.toLowerCase() === selectedCategory.toLowerCase()
+      );
     }
     if (selectedPlanType !== "All") {
-      list = list.filter((p) => (p.plan ?? "").toLowerCase() === selectedPlanType.toLowerCase())
+      list = list.filter(
+        (p) => (p.plan ?? "").toLowerCase() === selectedPlanType.toLowerCase()
+      );
     }
     if (selectedStatus !== "All") {
-      list = list.filter((p) => (p.status ?? "").toLowerCase() === selectedStatus.toLowerCase())
+      list = list.filter(
+        (p) => (p.status ?? "").toLowerCase() === selectedStatus.toLowerCase()
+      );
     }
     if (priceRange !== "All") {
-      list = list.filter((p) => (p.priceRange ?? "") === priceRange)
+      list = list.filter((p) => (p.priceRange ?? "") === priceRange);
     }
-    const q = (query || "").trim().toLowerCase()
+    const q = (query || "").trim().toLowerCase();
     if (q) {
       list = list.filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
           p.type.toLowerCase().includes(q) ||
           p.short.toLowerCase().includes(q) ||
-          (p.integrations || []).some((i) => i.toLowerCase().includes(q)),
-      )
+          (p.integrations || []).some((i) => i.toLowerCase().includes(q))
+      );
     }
-
     switch (sortBy) {
       case "Price: Low to High":
-        list.sort((a, b) => a.price - b.price)
-        break
+        list.sort((a, b) => a.price - b.price);
+        break;
       case "Price: High to Low":
-        list.sort((a, b) => b.price - a.price)
-        break
+        list.sort((a, b) => b.price - a.price);
+        break;
       case "Rating":
-        list.sort((a, b) => b.rating - a.rating)
-        break
+        list.sort((a, b) => b.rating - a.rating);
+        break;
       default:
-        break
+        break;
     }
-    return list
-  }, [selectedCategory, selectedPlanType, selectedStatus, priceRange, query, sortBy])
+    return list;
+  }, [
+    selectedCategory,
+    selectedPlanType,
+    selectedStatus,
+    priceRange,
+    query,
+    sortBy,
+  ]);
 
   return (
     <div className={`min-h-screen ${themeClasses.bg} ${themeClasses.text}`}>
@@ -123,10 +132,12 @@ export default function DealsPage() {
           <div className="bg-blue-600 text-white text-center py-2 px-4 rounded mb-4 text-sm">
             Welcome! 10% off is waiting in your cart—sign up. ↗
           </div>
-
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-8">
-              <Link href="/" className="text-2xl font-bold hover:text-green-400 transition-colors">
+              <Link
+                href="/"
+                className="text-2xl font-bold hover:text-green-400 transition-colors"
+              >
                 ADOPLE AI
               </Link>
               <div className="hidden md:flex items-center space-x-4">
@@ -142,14 +153,24 @@ export default function DealsPage() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className={`text-sm ${themeClasses.textSecondary}`}>Sell on Adople AI</span>
+              <span className={`text-sm ${themeClasses.textSecondary}`}>
+                Sell on Adople AI
+              </span>
               <Button variant="ghost" size="sm" onClick={toggleTheme} className="p-2">
-                {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                {isDarkMode ? (
+                  <Sun className="w-4 h-4" />
+                ) : (
+                  <Moon className="w-4 h-4" />
+                )}
               </Button>
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/login">Log in</Link>
               </Button>
-              <Button className="bg-green-500 hover:bg-green-600 text-black" size="sm" asChild>
+              <Button
+                className="bg-green-500 hover:bg-green-600 text-black"
+                size="sm"
+                asChild
+              >
                 <Link href="/signup">Sign up</Link>
               </Button>
               <Bell className="w-5 h-5" />
@@ -158,7 +179,6 @@ export default function DealsPage() {
               </Link>
             </div>
           </div>
-
           {/* Navigation */}
           <nav className="flex space-x-6 mt-4">
             <Link href="/deals?category=Software" className="hover:text-green-400">
@@ -181,32 +201,34 @@ export default function DealsPage() {
           </nav>
         </div>
       </header>
-
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex gap-8">
           {/* Sidebar */}
-          <aside className={`${themeClasses.sidebarBg} w-64 p-6 rounded-lg h-fit`}>
+          <aside
+            className={`${themeClasses.sidebarBg} w-64 p-6 rounded-lg h-fit`}
+          >
             <div className="space-y-6">
               {/* Shop by */}
               <div>
                 <h3 className="font-semibold mb-3">Shop by</h3>
                 <ul className="space-y-2 text-sm">
-                  {["Software", "Courses", "Templates", "Creative resources"].map((c) => (
-                    <li key={c}>
-                      <button
-                        onClick={() => {
-                          setSelectedCategory(c)
-                          updateParam("category", c)
-                        }}
-                        className={`${themeClasses.textSecondary} ${themeClasses.hoverBg} block w-full text-left p-1 rounded`}
-                      >
-                        {c}
-                      </button>
-                    </li>
-                  ))}
+                  {["Software", "Courses", "Templates", "Creative resources"].map(
+                    (c) => (
+                      <li key={c}>
+                        <button
+                          onClick={() => {
+                            setSelectedCategory(c);
+                            updateParam("category", c);
+                          }}
+                          className={`${themeClasses.textSecondary} ${themeClasses.hoverBg} block w-full text-left p-1 rounded`}
+                        >
+                          {c}
+                        </button>
+                      </li>
+                    )
+                  )}
                 </ul>
               </div>
-
               {/* ADOPLE AI SELECT */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -214,7 +236,6 @@ export default function DealsPage() {
                   <span className="text-sm">?</span>
                 </div>
               </div>
-
               {/* Integrations */}
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -222,7 +243,14 @@ export default function DealsPage() {
                   <ChevronDown className="w-4 h-4" />
                 </div>
                 <div className="space-y-2 text-sm">
-                  {["WordPress", "Webflow", "Zapier", "OpenAI", "Slack", "Google Calendar"].map((i) => (
+                  {[
+                    "WordPress",
+                    "Webflow",
+                    "Zapier",
+                    "OpenAI",
+                    "Slack",
+                    "Google Calendar",
+                  ].map((i) => (
                     <label key={i} className="flex items-center gap-2">
                       <input
                         type="checkbox"
@@ -233,9 +261,9 @@ export default function DealsPage() {
                             : query
                                 .split(" ")
                                 .filter((t) => t.toLowerCase() !== i.toLowerCase())
-                                .join(" ")
-                          setQuery(next)
-                          updateParam("q", next)
+                                .join(" ");
+                          setQuery(next);
+                          updateParam("q", next);
                         }}
                       />
                       <span className={themeClasses.textSecondary}>{i}</span>
@@ -243,7 +271,6 @@ export default function DealsPage() {
                   ))}
                 </div>
               </div>
-
               {/* Plan type */}
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -254,8 +281,8 @@ export default function DealsPage() {
                   className={`w-full rounded border px-2 py-1 ${themeClasses.inputBg} ${themeClasses.inputBorder}`}
                   value={selectedPlanType}
                   onChange={(e) => {
-                    setPlanType(e.target.value)
-                    updateParam("plan", e.target.value)
+                    setPlanType(e.target.value);
+                    updateParam("plan", e.target.value);
                   }}
                 >
                   {["All", "Lifetime", "Subscription", "One-time"].map((o) => (
@@ -263,7 +290,6 @@ export default function DealsPage() {
                   ))}
                 </select>
               </div>
-
               {/* Status */}
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -274,8 +300,8 @@ export default function DealsPage() {
                   className={`w-full rounded border px-2 py-1 ${themeClasses.inputBg} ${themeClasses.inputBorder}`}
                   value={selectedStatus}
                   onChange={(e) => {
-                    setSelectedStatus(e.target.value)
-                    updateParam("status", e.target.value)
+                    setSelectedStatus(e.target.value);
+                    updateParam("status", e.target.value);
                   }}
                 >
                   {["All", "new", "hot", "ending"].map((o) => (
@@ -283,7 +309,6 @@ export default function DealsPage() {
                   ))}
                 </select>
               </div>
-
               {/* Price range */}
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -294,8 +319,8 @@ export default function DealsPage() {
                   className={`w-full rounded border px-2 py-1 ${themeClasses.inputBg} ${themeClasses.inputBorder}`}
                   value={priceRange}
                   onChange={(e) => {
-                    setPriceRange(e.target.value)
-                    updateParam("price", e.target.value)
+                    setPriceRange(e.target.value);
+                    updateParam("price", e.target.value);
                   }}
                 >
                   <option>All</option>
@@ -306,7 +331,6 @@ export default function DealsPage() {
               </div>
             </div>
           </aside>
-
           {/* Main content */}
           <main className="flex-1">
             {/* Header */}
@@ -314,15 +338,17 @@ export default function DealsPage() {
               <div className="flex items-center gap-3">
                 <div>
                   <h1 className="text-2xl font-bold mb-1">Browse products</h1>
-                  <p className={`${themeClasses.textSecondary}`}>{filtered.length} products</p>
+                  <p className={`${themeClasses.textSecondary}`}>
+                    {filtered.length} products
+                  </p>
                 </div>
                 {/* inline search updates URL and filter */}
                 <div className="hidden md:flex items-center ml-6">
                   <Input
                     value={query}
                     onChange={(e) => {
-                      setQuery(e.target.value)
-                      updateParam("q", e.target.value)
+                      setQuery(e.target.value);
+                      updateParam("q", e.target.value);
                     }}
                     placeholder="Search"
                     className={`min-w-[240px] ${themeClasses.inputBg} ${themeClasses.inputBorder} ${themeClasses.text}`}
@@ -335,8 +361,8 @@ export default function DealsPage() {
                   className={`${themeClasses.inputBg} ${themeClasses.inputBorder} ${themeClasses.text} px-3 py-1 rounded border`}
                   value={sortBy}
                   onChange={(e) => {
-                    setSortBy(e.target.value)
-                    updateParam("sort", e.target.value)
+                    setSortBy(e.target.value);
+                    updateParam("sort", e.target.value);
                   }}
                 >
                   <option>Recommended</option>
@@ -347,11 +373,10 @@ export default function DealsPage() {
                 </select>
               </div>
             </div>
-
             {/* Products grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filtered.map((product) => {
-                const slug = product.slug
+                const slug = product.slug;
                 return (
                   <Card
                     key={slug}
@@ -368,7 +393,10 @@ export default function DealsPage() {
                     </CardHeader>
                     <CardContent className="p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="secondary" className="bg-green-600 text-white text-xs">
+                        <Badge
+                          variant="secondary"
+                          className="bg-green-600 text-white text-xs"
+                        >
                           {product.badge ?? "ADOPLE AI SELECT"}
                         </Badge>
                       </div>
@@ -377,15 +405,23 @@ export default function DealsPage() {
                           {product.name}
                         </Link>
                       </CardTitle>
-                      <p className={`text-sm ${themeClasses.textMuted} mb-2`}>in {product.type}</p>
-                      <CardDescription className={`${themeClasses.textSecondary} text-sm mb-3 line-clamp-2`}>
+                      <p className={`text-sm ${themeClasses.textMuted} mb-2`}>
+                        in {product.type}
+                      </p>
+                      <CardDescription
+                        className={`${themeClasses.textSecondary} text-sm mb-3 line-clamp-2`}
+                      >
                         {product.short}
                       </CardDescription>
                       <div className="flex items-center gap-1 mb-3">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`w-4 h-4 ${i < Math.floor(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                            className={`w-4 h-4 ${
+                              i < Math.floor(product.rating)
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-gray-300"
+                            }`}
                           />
                         ))}
                         <span className={`text-sm ${themeClasses.textMuted} ml-1`}>
@@ -396,9 +432,13 @@ export default function DealsPage() {
                     <CardFooter className="p-4 pt-0">
                       <div className="w-full">
                         <div className="flex items-baseline gap-2 mb-3">
-                          <span className={`text-2xl font-bold ${themeClasses.text}`}>${product.price}</span>
+                          <span className={`text-2xl font-bold ${themeClasses.text}`}>
+                            ${product.price}
+                          </span>
                           {product.compareAt && (
-                            <span className={`text-sm ${themeClasses.textMuted} line-through`}>
+                            <span
+                              className={`text-sm ${themeClasses.textMuted} line-through`}
+                            >
                               ${product.compareAt}
                             </span>
                           )}
@@ -411,15 +451,16 @@ export default function DealsPage() {
                       </div>
                     </CardFooter>
                   </Card>
-                )
+                );
               })}
             </div>
           </main>
         </div>
       </div>
-
       {/* Footer */}
-      <footer className={`px-4 py-12 ${themeClasses.footerBg} border-t ${themeClasses.footerBorder} mt-16`}>
+      <footer
+        className={`px-4 py-12 ${themeClasses.footerBg} border-t ${themeClasses.footerBorder} mt-16`}
+      >
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
@@ -503,5 +544,6 @@ export default function DealsPage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
+
